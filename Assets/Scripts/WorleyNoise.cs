@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
+using System.IO;
 
 public class WorleyNoise : MonoBehaviour
 {
@@ -8,6 +10,8 @@ public class WorleyNoise : MonoBehaviour
     public Gradient gradient;
     public int numPoints = 7;
     public int z;
+    public int n;
+    public string ExportPath;
     public bool evolve;
     private int width;
     private int height;
@@ -53,19 +57,23 @@ public class WorleyNoise : MonoBehaviour
                     distances[i] = d;
                 }
                 System.Array.Sort(distances);
-                float noise = Math.Remap(distances[0], 0, width / 2, 1, 0);
+                float noise = Math.Remap(distances[n], 0, width / 2, 1, 0);
                 
                 tex.SetPixel(x, y, gradient.Evaluate(noise));
             }
         }
-        /*
-        foreach (Vector2Int pos in points)
-        {
-            tex.SetPixel(pos.x, pos.y, Color.red);
-
-        }
-        */
         tex.Apply();
     }
-
+    public void ExportToImage()
+    {
+        byte[] img = tex.EncodeToPNG();
+        try
+        {
+        File.WriteAllBytes(ExportPath + "/output.png", img);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e.Message);
+        }
+    }
 }
